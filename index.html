@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiệm Trà Sữa & Ăn Vặt Xương Thịnh - Cẩm Khê</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF6B35',
+                            orangeHover: '#E85A24',
+                            cream: '#FFF8F0',
+                            green: '#2EC4B6',
+                            dark: '#2B2D42',
+                            lightBg: '#FAFAF9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-brand-lightBg text-slate-800 antialiased min-h-screen flex flex-col pb-16 md:pb-0">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-orange-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
+            <!-- Brand Logo & Contact Header -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-orange to-amber-400 flex items-center justify-center text-white shadow-md shadow-orange-200 font-bold text-xl">
+                    <i class="fa-solid fa-mug-hot"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-xl text-slate-900 leading-tight">Tiệm Ăn Vặt Xương Thịnh</h1>
+                    <p class="text-[11px] text-brand-orange font-semibold flex items-center gap-2">
+                        <span><i class="fa-solid fa-phone text-[10px]"></i> Hotline/Zalo: <strong>0964777138</strong></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Search bar (Desktop) -->
+            <div class="hidden md:flex flex-1 max-w-md relative">
+                <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Tìm trà sữa, cà phê, bánh tráng..." class="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-full text-sm border-transparent focus:border-brand-orange focus:bg-white focus:ring-2 focus:ring-orange-200 outline-none transition-all">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-sm"></i>
+            </div>
+
+            <!-- Right Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Admin Lock Button -->
+                <button onclick="openAdminPinModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-full font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all" title="Dành cho Quản Lý Cửa Hàng">
+                    <i class="fa-solid fa-user-shield text-amber-400"></i>
+                    <span class="hidden lg:inline">Admin Quản Lý</span>
+                </button>
+
+                <!-- User Profile Indicator -->
+                <div id="userBadge" class="hidden sm:flex items-center gap-2 bg-orange-50 text-slate-700 px-3 py-1.5 rounded-full text-xs font-semibold border border-orange-100">
+                    <div class="w-6 h-6 rounded-full bg-brand-orange text-white flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <span id="displayUserPhone">098***</span>
+                    <button onclick="logout()" class="ml-1 text-slate-400 hover:text-red-500 transition-colors" title="Đăng xuất">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+
+                <!-- Cart Button -->
+                <button onclick="toggleCartDrawer(true)" class="relative bg-brand-orange hover:bg-brand-orangeHover text-white px-3.5 sm:px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-md shadow-orange-200 transition-all active:scale-95">
+                    <i class="fa-solid fa-basket-shopping text-base"></i>
+                    <span class="hidden sm:inline">Giỏ hàng</span>
+                    <span id="cartCountBadge" class="bg-white text-brand-orange font-extrabold text-xs px-2 py-0.5 rounded-full shadow-inner">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div class="px-4 pb-3 md:hidden">
+            <div class="relative w-full">
+                <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Tìm trà sữa, cà phê, đồ ăn vặt..." class="w-full pl-9 pr-4 py-2 bg-slate-100 rounded-full text-xs border-transparent focus:border-brand-orange focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Info -->
+    <section class="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 text-white py-6 sm:py-8 px-4 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+            <div>
+                <span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-orange-100 border border-white/20 inline-block mb-2">
+                    🔥 Đặt Hàng Trực Tuyến - Giao Tận Nơi Cẩm Khê
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Trà Sữa & Đồ Ăn Vặt Xương Thịnh</h2>
+                <p class="text-orange-100 text-xs sm:text-sm mt-1">SĐT/Zalo: <strong class="text-white underline">0964777138</strong> | Gmail: <strong class="text-white underline">vuthanhmai07091988@gmail.com</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Tabs Navigation -->
+    <div class="sticky top-16 z-20 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 overflow-x-auto custom-scrollbar">
+            <div id="categoryTabs" class="flex gap-2 py-3 min-w-max"></div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+        <div class="flex items-center justify-between mb-6">
+            <h3 id="currentCategoryTitle" class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                <span>Tất cả sản phẩm</span>
+            </h3>
+            <span id="productCount" class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">0 món</span>
+        </div>
+
+        <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
+
+        <div id="emptyState" class="hidden text-center py-16">
+            <div class="w-20 h-20 bg-orange-100 text-brand-orange rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fa-solid fa-utensils"></i>
+            </div>
+            <h4 class="text-lg font-bold text-slate-700">Không tìm thấy sản phẩm phù hợp</h4>
+            <p class="text-slate-400 text-sm mt-1">Vui lòng thử từ khóa hoặc danh mục khác!</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center gap-2 text-white font-bold text-lg mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-orange flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-mug-hot"></i>
+                    </div>
+                    Tiệm Ăn Vặt Xương Thịnh
+                </div>
+                <p class="text-xs leading-relaxed text-slate-400">
+                    Chuyên trà sữa, cà phê, nước ép trái cây tươi và bánh tráng ăn vặt giòn ngon chuẩn vị tại Cẩm Khê, Phú Thọ.
+                </p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-sm mb-3">Liên Hệ & Hỗ Trợ Đặt Hàng</h4>
+                <p class="text-xs text-slate-300 mb-2"><i class="fa-solid fa-location-dot text-brand-orange mr-2"></i> Xương Thịnh, Huyện Cẩm Khê, Phú Thọ</p>
+                <p class="text-xs text-slate-300 mb-2"><i class="fa-solid fa-phone text-brand-orange mr-2"></i> Hotline / Zalo: <strong class="text-white">0964777138</strong></p>
+                <p class="text-xs text-slate-300 mb-2"><i class="fa-solid fa-envelope text-brand-orange mr-2"></i> Gmail: <strong class="text-white">vuthanhmai07091988@gmail.com</strong></p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-sm mb-3">Khu Vực & Phí Ship</h4>
+                <ul class="text-xs space-y-1.5 text-slate-400">
+                    <li>• Miễn phí ship dưới 1km hoặc đơn từ <strong class="text-amber-400">70.000đ</strong>.</li>
+                    <li>• Vùng giáp ranh Xương Thịnh / Sơn Tình (1-2km): <strong class="text-emerald-400">Phí ship 5.000đ</strong>.</li>
+                    <li>• Khu vực Phú Khê: <strong class="text-emerald-400">Phí ship 10.000đ</strong>.</li>
+                    <li class="text-red-400">• Từ chối nhận đơn ngoài phạm vi phục vụ (> 4km).</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODALS -->
+
+    <!-- 1. AUTH MODAL -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-orange-100 transition-all">
+            <div class="bg-gradient-to-r from-brand-orange to-amber-500 p-6 text-white text-center">
+                <h3 class="text-xl font-extrabold">Chào Mừng Đến Với Tiệm!</h3>
+                <p class="text-orange-100 text-xs mt-1">Đăng nhập hoặc tạo tài khoản để mua sắm</p>
+            </div>
+            <div class="flex border-b border-slate-100 bg-slate-50 p-1">
+                <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-brand-orange bg-white shadow-sm">Đăng Nhập</button>
+                <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-500">Tạo Tài Khoản Mới</button>
+            </div>
+            <div class="p-6">
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại</label>
+                        <input type="tel" id="loginPhone" required placeholder="Nhập số điện thoại" class="w-full px-3 py-2.5 bg-slate-50 rounded-xl text-xs font-semibold border border-slate-200 outline-none focus:border-brand-orange">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu</label>
+                        <input type="password" id="loginPassword" required placeholder="Mật khẩu" class="w-full px-3 py-2.5 bg-slate-50 rounded-xl text-xs font-semibold border border-slate-200 outline-none focus:border-brand-orange">
+                    </div>
+                    <div id="loginError" class="hidden text-xs text-red-500 bg-red-50 p-2 rounded-lg">Mật khẩu hoặc SĐT sai!</div>
+                    <button type="submit" class="w-full bg-brand-orange text-white py-3 rounded-xl font-bold text-sm">Đăng Nhập</button>
+                </form>
+
+                <form id="registerForm" onsubmit="handleRegister(event)" class="hidden space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại</label>
+                        <input type="tel" id="regPhone" required placeholder="Số điện thoại của bạn" class="w-full px-3 py-2.5 bg-slate-50 rounded-xl text-xs font-semibold border border-slate-200 outline-none focus:border-brand-orange">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu</label>
+                        <input type="password" id="regPassword" required placeholder="Tối thiểu 6 ký tự" class="w-full px-3 py-2.5 bg-slate-50 rounded-xl text-xs font-semibold border border-slate-200 outline-none focus:border-brand-orange">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Xác nhận mật khẩu</label>
+                        <input type="password" id="regConfirmPassword" required placeholder="Nhập lại mật khẩu" class="w-full px-3 py-2.5 bg-slate-50 rounded-xl text-xs font-semibold border border-slate-200 outline-none focus:border-brand-orange">
+                    </div>
+                    <div id="regError" class="hidden text-xs text-red-500 bg-red-50 p-2 rounded-lg"></div>
+                    <button type="submit" class="w-full bg-brand-orange text-white py-3 rounded-xl font-bold text-sm">Gửi Mã OTP Xác Thực</button>
+                </form>
+
+                <div id="otpStep" class="hidden space-y-4">
+                    <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl text-center text-xs">
+                        Mã OTP giả lập: <strong id="simulatedOtpCode" class="text-brand-orange text-base font-mono">1234</strong>
+                    </div>
+                    <input type="text" id="otpInput" maxlength="4" placeholder="----" class="w-full py-2.5 bg-slate-50 rounded-xl text-center text-xl font-mono font-bold border border-slate-200">
+                    <div id="otpError" class="hidden text-xs text-red-500 text-center">OTP sai!</div>
+                    <button onclick="verifyOtpAndRegister()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-sm">Xác Nhận & Đăng Nhập</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. PRODUCT DETAIL MODAL -->
+    <div id="productModal" class="fixed inset-0 z-40 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="relative bg-gradient-to-tr from-amber-50 to-orange-100 h-44 sm:h-52 shrink-0 flex items-center justify-center">
+                <span id="modalProductSticker" class="text-8xl">🧋</span>
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/80 text-slate-700 font-bold">✕</button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4 flex-1">
+                <div>
+                    <span id="modalCategoryBadge" class="text-[10px] font-extrabold uppercase text-brand-orange bg-orange-100 px-2.5 py-0.5 rounded-full"></span>
+                    <h3 id="modalTitle" class="text-xl font-extrabold text-slate-900 mt-1"></h3>
+                    <p id="modalPrice" class="text-lg font-bold text-brand-orange mt-0.5"></p>
+                </div>
+                <div id="modalVariantSection" class="space-y-2 border-t border-slate-100 pt-3">
+                    <label class="block text-xs font-bold text-slate-700">Tùy Chọn / Size:</label>
+                    <div id="modalVariantContainer" class="grid grid-cols-2 gap-2"></div>
+                </div>
+                <div class="border-t border-slate-100 pt-3">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Ghi chú món</label>
+                    <input type="text" id="itemNoteInput" placeholder="Ví dụ: Ít đường, nhiều đá..." class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs border border-slate-200 outline-none">
+                </div>
+                <div class="flex items-center justify-between border-t border-slate-100 pt-4">
+                    <span class="text-xs font-bold text-slate-700">Số lượng:</span>
+                    <div class="flex items-center gap-3 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="updateModalQuantity(-1)" class="w-8 h-8 bg-white rounded-lg font-bold text-slate-700">-</button>
+                        <span id="modalQtyDisplay" class="font-bold text-sm w-6 text-center">1</span>
+                        <button onclick="updateModalQuantity(1)" class="w-8 h-8 bg-white rounded-lg font-bold text-slate-700">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-100">
+                <button onclick="confirmAddToCart()" class="w-full bg-brand-orange text-white py-3 rounded-2xl font-bold text-sm">Thêm Vào Giỏ - <span id="modalTotalPrice"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. CART DRAWER -->
+    <div id="cartDrawer" class="fixed inset-0 z-40 hidden">
+        <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-slate-900/50"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col h-full">
+            <div class="p-4 border-b flex items-center justify-between bg-slate-50">
+                <h3 class="font-extrabold text-slate-800 text-base">Giỏ Hàng Của Bạn</h3>
+                <button onclick="toggleCartDrawer(false)" class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold">✕</button>
+            </div>
+            <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar"></div>
+            <div id="checkoutSection" class="p-4 bg-slate-50 border-t space-y-3">
+                <label class="block text-[11px] font-bold text-slate-600">Bán kính & Khu vực giao hàng:</label>
+                <select id="distanceSelect" onchange="calculateShippingFee()" class="w-full p-2 bg-white rounded-xl text-xs font-semibold border border-slate-300">
+                    <option value="0.5">Xương Thịnh (< 1km) - Freeship</option>
+                    <option value="1.8">Khu Vực Rắn / Sơn Tình (1 - 2km) - Ship 5k</option>
+                    <option value="2.5">Khu vực Phú Khê - Ship 10k</option>
+                    <option value="3.5">Khu vực Cẩm Khê khác (2 - 4km) - Ship 10k</option>
+                    <option value="5.5">Khu vực ngoài bán kính (> 4km) - Không ship</option>
+                </select>
+                <input type="text" id="shippingAddress" placeholder="Địa chỉ chi tiết (VD: Số 18, Khu 2 Xương Thịnh)" class="w-full p-2 bg-white rounded-xl text-xs border border-slate-300 outline-none">
+                <input type="text" id="orderNotes" placeholder="Ghi chú cho tiệm" class="w-full p-2 bg-white rounded-xl text-xs border border-slate-300 outline-none">
+                
+                <div class="space-y-1 pt-2 border-t text-xs">
+                    <div class="flex justify-between text-slate-600"><span>Tiền món:</span><span id="subtotalDisplay" class="font-semibold">0đ</span></div>
+                    <div class="flex justify-between text-slate-600"><span>Phí giao hàng:</span><span id="shippingFeeDisplay" class="font-semibold text-brand-orange">0đ</span></div>
+                    <div id="blockedDistanceNotice" class="hidden text-[11px] text-red-600 font-bold bg-red-50 p-2 rounded-lg">⚠️ Khu vực này nằm ngoài vùng phục vụ giao hàng (> 4km).</div>
+                    <div class="flex justify-between text-sm font-extrabold text-slate-900 pt-1 border-t"><span>Tổng tiền:</span><span id="grandTotalDisplay" class="text-brand-orange text-base">0đ</span></div>
+                </div>
+                <button id="checkoutBtn" onclick="submitOrder()" class="w-full bg-brand-orange text-white py-3 rounded-2xl font-bold text-sm">Đặt Hàng Ngay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. ADMIN PIN MODAL -->
+    <div id="adminPinModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center space-y-4">
+            <h3 class="text-lg font-extrabold text-slate-900">Xác Nhận Admin Quản Lý</h3>
+            <p class="text-xs text-slate-500">Nhập mật khẩu PIN 4 số để xem đơn hàng</p>
+            <input type="password" id="adminPinInput" maxlength="4" placeholder="••••" class="w-full py-3 bg-slate-50 rounded-2xl text-center text-2xl font-mono font-bold border border-slate-200">
+            <div id="adminPinError" class="hidden text-xs text-red-500 font-semibold">PIN sai!</div>
+            <div class="flex gap-2">
+                <button onclick="closeAdminPinModal()" class="flex-1 py-2.5 bg-slate-100 rounded-xl font-bold text-xs">Hủy</button>
+                <button onclick="verifyAdminPin()" class="flex-1 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs">Mở Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. ADMIN DASHBOARD MODAL -->
+    <div id="adminDashboardModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 bg-slate-900/80 backdrop-blur-md">
+        <div class="bg-white w-full max-w-4xl rounded-3xl flex flex-col h-[92vh] overflow-hidden">
+            <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="text-base font-extrabold">Quản Lý Đơn Hàng & Doanh Thu</h3>
+                    <p class="text-xs text-slate-400">Tiệm Ăn Vặt Xương Thịnh</p>
+                </div>
+                <button onclick="closeAdminDashboard()" class="w-8 h-8 rounded-full bg-slate-800 text-white font-bold">✕</button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 p-4 bg-slate-50 border-b shrink-0">
+                <div class="bg-white p-3 rounded-2xl border">
+                    <p class="text-[11px] font-bold text-slate-400">TỔNG DOANH THU</p>
+                    <h4 id="adminTotalRevenue" class="text-lg font-extrabold text-brand-orange">0đ</h4>
+                </div>
+                <div class="bg-white p-3 rounded-2xl border flex justify-between items-center">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400">TỔNG ĐƠN HÀNG</p>
+                        <h4 id="adminTotalOrdersCount" class="text-lg font-extrabold text-slate-800">0 đơn</h4>
+                    </div>
+                    <button onclick="clearAllOrders()" class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-xl font-bold text-xs transition-all">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Xóa tất cả
+                    </button>
+                </div>
+            </div>
+
+            <div id="adminOrdersList" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-100 custom-scrollbar"></div>
+            
+            <div class="p-3 bg-white border-t text-center">
+                <button onclick="closeAdminDashboard()" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS RECEIPT MODAL -->
+    <div id="successModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl space-y-4">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto text-3xl">✓</div>
+            <h3 class="text-xl font-extrabold text-slate-900">Đặt Hàng Thành Công!</h3>
+            <p class="text-xs text-slate-500">Đơn hàng đã được ghi nhận và báo về điện thoại của chủ quán.</p>
+            <div class="bg-slate-50 p-3 rounded-2xl text-left text-xs space-y-1 font-mono">
+                <div class="flex justify-between"><span>Mã đơn:</span><span id="receiptOrderCode" class="font-bold"></span></div>
+                <div class="flex justify-between"><span>Tổng tiền:</span><span id="receiptTotal" class="font-bold text-brand-orange"></span></div>
+            </div>
+            <button onclick="closeSuccessModal()" class="w-full bg-slate-900 text-white py-3 rounded-2xl font-bold text-xs">Quay Lại Mua Sắm</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN';
+        const TELEGRAM_CHAT_ID = 'YOUR_TELEGRAM_CHAT_ID';
+
+        const PRODUCTS = [
+            // Trà Sữa
+            { id: 'ts1', category: 'Trà Sữa', name: 'Trà Sữa vị Xoài', price: 25000, sticker: '🥭' },
+            { id: 'ts2', category: 'Trà Sữa', name: 'Trà Sữa Việt Quất', price: 25000, sticker: '🫐' },
+            { id: 'ts3', category: 'Trà Sữa', name: 'Trà Sữa Đào', price: 25000, sticker: '🍑' },
+            { id: 'ts4', category: 'Trà Sữa', name: 'Trà Sữa Dâu', price: 25000, sticker: '🍓' },
+            { id: 'ts5', category: 'Trà Sữa', name: 'Trà Sữa Khoai Môn', price: 25000, sticker: '🍠' },
+            { id: 'ts6', category: 'Trà Sữa', name: 'Trà Sữa Kem Cheesy', price: 25000, sticker: '🧀' },
+            { id: 'ts7', category: 'Trà Sữa', name: 'Trà Chanh', price: 15000, sticker: '🍋' },
+            { id: 'ts8', category: 'Trà Sữa', name: 'Trà Tắc', price: 15000, sticker: '🍊' },
+            { id: 'ts9', category: 'Trà Sữa', name: 'Trà Đào', price: 20000, sticker: '🍑' },
+
+            // Cà Phê
+            { id: 'cp1', category: 'Cà Phê', name: 'Cà Phê Đen Đá', price: 15000, sticker: '☕' },
+            { id: 'cp2', category: 'Cà Phê', name: 'Cà Phê Nâu', price: 20000, sticker: '☕' },
+            { id: 'cp3', category: 'Cà Phê', name: 'Bạc Xỉu', price: 25000, sticker: '🥛' },
+            { id: 'cp4', category: 'Cà Phê', name: 'Cà Phê Kem Trứng', price: 25000, sticker: '🍮' },
+
+            // Nước Ép
+            { id: 'ne1', category: 'Nước Ép', name: 'Nước Ép Ổi', price: 25000, sticker: '🍈' },
+            { id: 'ne2', category: 'Nước Ép', name: 'Nước Ép Cam Tươi', price: 25000, sticker: '🍊' },
+            { id: 'ne3', category: 'Nước Ép', name: 'Nước Ép Táo', price: 25000, sticker: '🍎' },
+            { id: 'ne4', category: 'Nước Ép', name: 'Nước Ép Dưa Hấu', price: 25000, sticker: '🍉' },
+            { id: 'ne5', category: 'Nước Ép', name: 'Nước Ép Lựu', price: 20000, sticker: '🍒' },
+
+            // Matcha Latte
+            { id: 'mc1', category: 'Matcha Latte', name: 'Matcha Latte Thường', price: 25000, sticker: '🍵' },
+            { id: 'mc2', category: 'Matcha Latte', name: 'Matcha Latte Trứng Muối', price: 25000, sticker: '🍳' },
+            { id: 'mc3', category: 'Matcha Latte', name: 'Matcha Latte Kem Trứng', price: 25000, sticker: '🍵' },
+            { id: 'mc4', category: 'Matcha Latte', name: 'Matcha Latte Xoài', price: 25000, sticker: '🥭' },
+            { id: 'mc5', category: 'Matcha Latte', name: 'Matcha Latte Việt Quất', price: 25000, sticker: '🫐' },
+            { id: 'mc6', category: 'Matcha Latte', name: 'Matcha Latte Dâu', price: 25000, sticker: '🍓' },
+
+            // Sữa Chua
+            { id: 'sc1', category: 'Sữa Chua', name: 'Sữa Chua Lắc các vị (Quất, Đào, Chanh Dây, Việt Quất, Xoài, Dâu)', price: 25000, sticker: '🍧', variants: [{ name: 'Size Vừa', price: 25000 }, { name: 'Size Lớn (Đặc Biệt)', price: 30000 }] },
+            { id: 'sc2', category: 'Sữa Chua', name: 'Sữa Chua Trân Châu Đường Đen', price: 25000, sticker: '🧋', variants: [{ name: 'Size Vừa', price: 25000 }, { name: 'Size Lớn', price: 30000 }] },
+
+            // Đồ Ăn Vặt
+            { id: 'av1', category: 'Đồ Ăn Vặt', name: 'Bánh Tráng Trộn', price: 25000, sticker: '🥗' },
+            { id: 'av2', category: 'Đồ Ăn Vặt', name: 'Bánh Tráng Cuộn', price: 25000, sticker: '🌯' },
+            { id: 'av3', category: 'Đồ Ăn Vặt', name: 'Bánh Tráng Nướng', price: 20000, sticker: '🍕', variants: [{ name: 'Loại Thường', price: 20000 }, { name: 'Full Topping', price: 35000 }] },
+            { id: 'av4', category: 'Đồ Ăn Vặt', name: 'Bánh Tráng Nướng Phô Mai', price: 25000, sticker: '🧀' },
+            { id: 'av5', category: 'Đồ Ăn Vặt', name: 'Bánh Mì Muối Ớt', price: 10000, sticker: '🥖', variants: [{ name: 'Thường', price: 10000 }, { name: 'Full Topping 25k', price: 25000 }] }
+        ];
+
+        const CATEGORIES = ['Tất cả', 'Trà Sữa', 'Cà Phê', 'Nước Ép', 'Matcha Latte', 'Sữa Chua', 'Đồ Ăn Vặt'];
+        let currentUser = null, selectedCategory = 'Tất cả', searchQuery = '', cart = [];
+        let selectedProduct = null, selectedVariant = null, currentModalQty = 1;
+        let pendingPhone = '', pendingPassword = '', generatedOtp = '1234';
+
+        window.onload = function() { checkSession(); renderCategories(); renderProducts(); calculateShippingFee(); };
+
+        function checkSession() {
+            const savedUser = localStorage.getItem('snack_shop_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('userBadge').classList.remove('hidden');
+                document.getElementById('displayUserPhone').innerText = maskPhone(currentUser.phone);
+                document.getElementById('authModal').classList.add('hidden');
+            } else { document.getElementById('authModal').classList.remove('hidden'); }
+        }
+
+        function maskPhone(p) { return p.length > 5 ? p.substring(0, 3) + '***' + p.substring(p.length - 2) : p; }
+
+        function switchAuthTab(tab) {
+            document.getElementById('otpStep').classList.add('hidden');
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+            } else {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('registerForm').classList.remove('hidden');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const users = JSON.parse(localStorage.getItem('snack_shop_users_db') || '[]');
+            const found = users.find(u => u.phone === phone && u.password === password);
+            if (found) {
+                currentUser = { phone: phone };
+                localStorage.setItem('snack_shop_user', JSON.stringify(currentUser));
+                document.getElementById('loginError').classList.add('hidden');
+                checkSession();
+            } else { document.getElementById('loginError').classList.remove('hidden'); }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirmPassword').value;
+            if (password !== confirm) { alert("Mật khẩu không trùng khớp!"); return; }
+            pendingPhone = phone; pendingPassword = password;
+            generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+            document.getElementById('simulatedOtpCode').innerText = generatedOtp;
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('otpStep').classList.remove('hidden');
+        }
+
+        function verifyOtpAndRegister() {
+            if (document.getElementById('otpInput').value.trim() === generatedOtp) {
+                const users = JSON.parse(localStorage.getItem('snack_shop_users_db') || '[]');
+                users.push({ phone: pendingPhone, password: pendingPassword });
+                localStorage.setItem('snack_shop_users_db', JSON.stringify(users));
+                currentUser = { phone: pendingPhone };
+                localStorage.setItem('snack_shop_user', JSON.stringify(currentUser));
+                checkSession();
+            } else { document.getElementById('otpError').classList.remove('hidden'); }
+        }
+
+        function logout() { localStorage.removeItem('snack_shop_user'); currentUser = null; checkSession(); }
+
+        function renderCategories() {
+            document.getElementById('categoryTabs').innerHTML = CATEGORIES.map(cat => `
+                <button onclick="selectCategory('${cat}')" class="px-4 py-2 rounded-full text-xs font-bold ${selectedCategory === cat ? 'bg-brand-orange text-white' : 'bg-slate-100 text-slate-600'}">${cat}</button>
+            `).join('');
+        }
+
+        function selectCategory(cat) { selectedCategory = cat; renderCategories(); renderProducts(); }
+        function handleSearch(q) { searchQuery = q.toLowerCase().trim(); renderProducts(); }
+
+        function renderProducts() {
+            let filtered = PRODUCTS.filter(p => (selectedCategory === 'Tất cả' || p.category === selectedCategory) && p.name.toLowerCase().includes(searchQuery));
+            document.getElementById('productCount').innerText = `${filtered.length} món`;
+            if (filtered.length === 0) { document.getElementById('productGrid').innerHTML = ''; document.getElementById('emptyState').classList.remove('hidden'); return; }
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('productGrid').innerHTML = filtered.map(product => `
+                <div class="bg-white rounded-2xl p-3 border shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-32 bg-gradient-to-tr from-amber-50 to-orange-50 rounded-xl flex items-center justify-center text-5xl mb-2">
+                            ${product.sticker}
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-xs sm:text-sm leading-snug">${product.name}</h4>
+                    </div>
+                    <div class="mt-2 pt-2 border-t flex justify-between items-center">
+                        <span class="text-xs sm:text-sm font-extrabold text-brand-orange">${product.price.toLocaleString('vi-VN')}đ</span>
+                        <button onclick="openProductModal('${product.id}')" class="bg-orange-100 text-brand-orange px-2.5 py-1.5 rounded-xl font-bold text-xs">+ Thêm</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openProductModal(id) {
+            selectedProduct = PRODUCTS.find(p => p.id === id);
+            currentModalQty = 1;
+            document.getElementById('modalQtyDisplay').innerText = currentModalQty;
+            document.getElementById('modalTitle').innerText = selectedProduct.name;
+            document.getElementById('modalCategoryBadge').innerText = selectedProduct.category;
+            document.getElementById('modalProductSticker').innerText = selectedProduct.sticker;
+            
+            const variantSection = document.getElementById('modalVariantSection');
+            if (selectedProduct.variants) {
+                selectedVariant = selectedProduct.variants[0];
+                variantSection.classList.remove('hidden');
+                document.getElementById('modalVariantContainer').innerHTML = selectedProduct.variants.map((v, i) => `
+                    <label class="border p-2 rounded-xl flex justify-between text-xs font-semibold">
+                        <input type="radio" name="pv" ${i===0?'checked':''} onchange="selectVariant('${v.name}', ${v.price})"> ${v.name} <span>${v.price.toLocaleString('vi-VN')}đ</span>
+                    </label>
+                `).join('');
+            } else { selectedVariant = { name: 'Thường', price: selectedProduct.price }; variantSection.classList.add('hidden'); }
+            updateModalPriceDisplay();
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        function selectVariant(name, price) { selectedVariant = { name, price }; updateModalPriceDisplay(); }
+        function updateModalQuantity(d) { if (currentModalQty + d >= 1) { currentModalQty += d; document.getElementById('modalQtyDisplay').innerText = currentModalQty; updateModalPriceDisplay(); } }
+        function updateModalPriceDisplay() {
+            const unit = selectedVariant ? selectedVariant.price : selectedProduct.price;
+            document.getElementById('modalPrice').innerText = unit.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('modalTotalPrice').innerText = (unit * currentModalQty).toLocaleString('vi-VN') + 'đ';
+        }
+        function closeProductModal() { document.getElementById('productModal').classList.add('hidden'); }
+
+        function confirmAddToCart() {
+            const unit = selectedVariant ? selectedVariant.price : selectedProduct.price;
+            cart.push({
+                name: selectedProduct.name,
+                variantName: selectedVariant ? selectedVariant.name : null,
+                price: unit,
+                quantity: currentModalQty,
+                sticker: selectedProduct.sticker,
+                note: document.getElementById('itemNoteInput').value.trim()
+            });
+            updateCartUI(); closeProductModal(); toggleCartDrawer(true);
+        }
+
+        function toggleCartDrawer(open) {
+            if (open) { document.getElementById('cartDrawer').classList.remove('hidden'); calculateShippingFee(); }
+            else { document.getElementById('cartDrawer').classList.add('hidden'); }
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCountBadge').innerText = cart.reduce((a, b) => a + b.quantity, 0);
+            if (cart.length === 0) {
+                document.getElementById('cartItemsList').innerHTML = `<p class="text-center text-slate-400 text-xs py-8">Giỏ hàng trống</p>`;
+            } else {
+                document.getElementById('cartItemsList').innerHTML = cart.map((item, idx) => `
+                    <div class="bg-slate-50 p-2.5 rounded-2xl flex gap-3 items-center border">
+                        <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-xl shrink-0">
+                            ${item.sticker}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h5 class="font-bold text-xs truncate">${item.name}</h5>
+                            <span class="text-xs font-bold text-slate-700">${(item.price * item.quantity).toLocaleString('vi-VN')}đ</span>
+                        </div>
+                        <div class="flex items-center gap-1 border rounded-lg bg-white p-1 text-xs">
+                            <button onclick="changeCartQty(${idx}, -1)" class="px-1.5 font-bold">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="changeCartQty(${idx}, 1)" class="px-1.5 font-bold">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            calculateShippingFee();
+        }
+
+        function changeCartQty(i, d) { cart[i].quantity += d; if (cart[i].quantity <= 0) cart.splice(i, 1); updateCartUI(); }
+
+        function calculateShippingFee() {
+            const distance = parseFloat(document.getElementById('distanceSelect').value);
+            const subtotal = cart.reduce((a, b) => a + (b.price * b.quantity), 0);
+            let fee = 0, isBlocked = false;
+            
+            if (distance > 4.0) { 
+                isBlocked = true; 
+            } else if (distance < 1.0 || subtotal >= 70000) { 
+                fee = 0; 
+            } else if (distance === 2.5) { 
+                fee = 10000; 
+            } else if (distance <= 2.0) { 
+                fee = 5000; 
+            } else { 
+                fee = 10000; 
+            }
+
+            document.getElementById('subtotalDisplay').innerText = subtotal.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('shippingFeeDisplay').innerText = fee.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('grandTotalDisplay').innerText = (isBlocked ? subtotal : subtotal + fee).toLocaleString('vi-VN') + 'đ';
+
+            if (isBlocked) {
+                document.getElementById('blockedDistanceNotice').classList.remove('hidden');
+                document.getElementById('checkoutBtn').disabled = true;
+            } else {
+                document.getElementById('blockedDistanceNotice').classList.add('hidden');
+                document.getElementById('checkoutBtn').disabled = cart.length === 0;
+            }
+        }
+
+        function sendTelegramNotification(order) {
+            if (TELEGRAM_BOT_TOKEN === 'YOUR_TELEGRAM_BOT_TOKEN') return;
+            
+            let message = `🔔 **CÓ ĐƠN HÀNG MỚI!**\n`;
+            message += `-------------------------\n`;
+            message += `🆔 Mã đơn: ${order.id}\n`;
+            message += `📞 SĐT Khách: ${order.customerPhone}\n`;
+            message += `📍 Địa chỉ: ${order.address}\n`;
+            message += `🌍 Khu vực: ${order.area}\n`;
+            if (order.notes) message += `📝 Ghi chú: ${order.notes}\n`;
+            message += `-------------------------\n`;
+            message += `🛒 **MÓN ĐẶT:**\n`;
+            order.items.forEach(i => {
+                message += `• ${i.name} ${i.variantName ? '('+i.variantName+')' : ''} x${i.quantity}: ${(i.price * i.quantity).toLocaleString('vi-VN')}đ\n`;
+            });
+            message += `-------------------------\n`;
+            message += `🚚 Phí ship: ${order.shippingFee.toLocaleString('vi-VN')}đ\n`;
+            message += `💰 **TỔNG TIỀN: ${order.grandTotal.toLocaleString('vi-VN')}đ**`;
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+            }).catch(e => console.log('Lỗi gửi Telegram:', e));
+        }
+
+        function submitOrder() {
+            if (!currentUser) { document.getElementById('authModal').classList.remove('hidden'); return; }
+            const address = document.getElementById('shippingAddress').value.trim();
+            if (!address) { alert('Vui lòng nhập địa chỉ cụ thể!'); return; }
+            
+            const distanceSelect = document.getElementById('distanceSelect');
+            const subtotal = cart.reduce((a, b) => a + (b.price * b.quantity), 0);
+            const distance = parseFloat(distanceSelect.value);
+            
+            let fee = 0;
+            if (distance < 1.0 || subtotal >= 70000) {
+                fee = 0;
+            } else if (distance === 2.5) {
+                fee = 10000;
+            } else if (distance <= 2.0) {
+                fee = 5000;
+            } else {
+                fee = 10000;
+            }
+
+            const grandTotal = subtotal + fee;
+            const orderCode = '#XT' + Math.floor(1000 + Math.random() * 9000);
+
+            const orderObj = {
+                id: orderCode, customerPhone: currentUser.phone, address: address,
+                area: distanceSelect.options[distanceSelect.selectedIndex].text,
+                notes: document.getElementById('orderNotes').value.trim(),
+                items: [...cart], subtotal, shippingFee: fee, grandTotal,
+                createdAt: new Date().toLocaleString('vi-VN')
+            };
+
+            const saved = JSON.parse(localStorage.getItem('snack_shop_all_orders') || '[]');
+            saved.unshift(orderObj);
+            localStorage.setItem('snack_shop_all_orders', JSON.stringify(saved));
+
+            sendTelegramNotification(orderObj);
+
+            document.getElementById('receiptOrderCode').innerText = orderCode;
+            document.getElementById('receiptTotal').innerText = grandTotal.toLocaleString('vi-VN') + 'đ';
+            cart = []; updateCartUI(); toggleCartDrawer(false);
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); }
+        function openAdminPinModal() { document.getElementById('adminPinInput').value = ''; document.getElementById('adminPinModal').classList.remove('hidden'); }
+        function closeAdminPinModal() { document.getElementById('adminPinModal').classList.add('hidden'); }
+        function verifyAdminPin() {
+            if (document.getElementById('adminPinInput').value.trim() === '2014') {
+                closeAdminPinModal(); openAdminDashboard();
+            } else { document.getElementById('adminPinError').classList.remove('hidden'); }
+        }
+        function openAdminDashboard() {
+            const orders = JSON.parse(localStorage.getItem('snack_shop_all_orders') || '[]');
+            const total = orders.reduce((a, b) => a + b.grandTotal, 0);
+            document.getElementById('adminTotalRevenue').innerText = total.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('adminTotalOrdersCount').innerText = `${orders.length} đơn`;
+
+            document.getElementById('adminOrdersList').innerHTML = orders.length === 0 ? '<p class="text-center text-xs py-8 text-slate-500">Chưa có đơn hàng nào</p>' : orders.map((o, idx) => `
+                <div class="bg-white p-3 rounded-2xl border text-xs space-y-2">
+                    <div class="flex justify-between border-b pb-1 font-bold items-center">
+                        <div>
+                            <span class="text-brand-orange text-sm font-extrabold">${o.id}</span>
+                            <span class="text-slate-400 ml-2">${o.createdAt}</span>
+                        </div>
+                        <button onclick="deleteSingleOrder(${idx})" class="bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded-lg text-xs font-bold transition-all">
+                            <i class="fa-solid fa-trash-can mr-1"></i> Xóa đơn
+                        </button>
+                    </div>
+                    <div><strong>SĐT Khách:</strong> <a href="tel:${o.customerPhone}" class="text-brand-orange underline font-mono">${o.customerPhone}</a></div>
+                    <div><strong>Địa chỉ:</strong> ${o.address} (${o.area})</div>
+                    ${o.notes ? `<div class="text-amber-700"><strong>Ghi chú:</strong> ${o.notes}</div>` : ''}
+                    <div class="bg-slate-50 p-2 rounded-lg space-y-1">
+                        ${o.items.map(i => `<div class="flex justify-between"><span>• ${i.name} ${i.variantName ? '('+i.variantName+')' : ''} x${i.quantity}</span><span class="font-mono font-bold">${(i.price*i.quantity).toLocaleString('vi-VN')}đ</span></div>`).join('')}
+                    </div>
+                    <div class="flex justify-between font-bold pt-1 border-t text-sm">
+                        <span>Phí ship: ${o.shippingFee.toLocaleString('vi-VN')}đ</span>
+                        <span class="text-brand-orange">Tổng: ${o.grandTotal.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('adminDashboardModal').classList.remove('hidden');
+        }
+
+        function deleteSingleOrder(index) {
+            if (confirm('Bạn có chắc chắn muốn xóa đơn hàng này không?')) {
+                const orders = JSON.parse(localStorage.getItem('snack_shop_all_orders') || '[]');
+                orders.splice(index, 1);
+                localStorage.setItem('snack_shop_all_orders', JSON.stringify(orders));
+                openAdminDashboard();
+            }
+        }
+
+        function clearAllOrders() {
+            if (confirm('Bạn có chắc chắn muốn xóa TẤT CẢ đơn hàng và doanh thu?')) {
+                localStorage.removeItem('snack_shop_all_orders');
+                openAdminDashboard();
+            }
+        }
+
+        function closeAdminDashboard() { document.getElementById('adminDashboardModal').classList.add('hidden'); }
+    </script>
+</body>
+</html>
+
